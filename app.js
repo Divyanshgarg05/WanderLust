@@ -115,6 +115,11 @@ app.use((err, req, res, next) => {
     // res.status(statusCode).send(message);
 });
 
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
+
+
 
 
 app.listen(8080,() => {
