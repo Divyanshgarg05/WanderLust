@@ -1,6 +1,7 @@
-if(process.env.NODE_ENV != "production"){
-    require('dotenv').config();
+if (process.env.NODE_ENV !== "production") {
+  require('dotenv').config();
 }
+
 
 
 const express = require("express");
@@ -26,6 +27,7 @@ const userRouter = require("./routes/user.js");
 
 
 const dbUrl = process.env.ATLASDB_URL;
+console.log("DBURL" , dbUrl);
 
 main().then(() => {
     console.log("connected to db")
@@ -52,7 +54,7 @@ const store = MongoStore.create({
     touchAfter: 24 * 3600,
 });
 
-store.on("error" ,() => {
+store.on("error" ,(err) => {
     console.log("Error in MONGO SESSION STORE",err);
 });
 
@@ -69,9 +71,6 @@ const sessionOptions = {
 
 
 
-// app.get( "/" ,(req,res) => {
-//     res.send("Working");
-// });
 
 
 
