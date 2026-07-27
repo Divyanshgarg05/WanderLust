@@ -24,7 +24,7 @@ const userRouter = require("./routes/user.js");
 // ------------------ DB CONFIG ------------------
 
 const dbUrl = process.env.ATLASDB_URL;
-console.log("DBURL:", dbUrl);
+
 
 // Agar env var set hi nahi hai
 if (!dbUrl) {
@@ -100,16 +100,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ------------------ ROUTES ------------------
 
-// app.get("/demouser" , async(req,res) => {
-//     let fakeUser = new User({
-//         email:"student@gmail.com",
-//         username: "delta-studdent"
-//     });
-//    let registeredUser = await User.register(fakeUser,"helloworld");
-//    res.send(registeredUser);
-// })
 
 app.use("/listings", listingsRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
