@@ -76,17 +76,6 @@
         </a>
       <% }); %>
 
-      <form class="d-flex align-items-center gap-2" action="/listings" method="GET">
-        <label class="visually-hidden" for="listing-search">Search listings</label>
-        <input id="listing-search" class="form-control" type="search" name="search" value="<%= searchTerm %>" placeholder="Search listings" />
-        <% if (currentType && currentType !== 'all') { %>
-          <input type="hidden" name="type" value="<%= currentType %>" />
-        <% } %>
-        <button class="btn search-btn" type="submit">
-          <i class="fa-solid fa-magnifying-glass"></i>Search
-        </button>
-      </form>
-
       <div class="tax-toggle">
         <div class="form-check-reverse form-switch">
     <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
