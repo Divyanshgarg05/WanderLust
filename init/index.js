@@ -1,9 +1,13 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 const mongoose = require("mongoose");
 const initData = require("./data.js");
 const Listing = require("../models/listing.js");
 
 // Connection URL me Database name 'test' kar diya hai
-const MONGO_URL = "mongodb+srv://divyanshgarg844:Divyansh%4087@cluster0.e9v8wce.mongodb.net/test?appName=Cluster0";
+// Hardcoded password remove karke environment variable use karo:
+const MONGO_URL = process.env.ATLASDB_URL || "mongodb://127.0.1:27017/test";
 
 main()
   .then(() => {

@@ -1,7 +1,9 @@
 const Listing = require("../models/listing");
 const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
 const mapToken = process.env.MAP_TOKEN;
-const geocodingClient = mbxGeocoding({ accessToken: mapToken });
+const geocodingClient = mapToken
+  ? mbxGeocoding({ accessToken: mapToken })
+  : null;
 
 const listingTypes = [
   { label: "All", value: "all", icon: "fa-solid fa-border-all" },
@@ -26,14 +28,39 @@ const listingTypes = [
   { label: "Boats", value: "boats", icon: "fa-solid fa-ship" },
 ];
 
+const buildListingFilter = ({ type, search }) => {
+  const filter = {};
+
+  if (type && type !== "all") {
+    filter.type = type;
+  }
+
+  const normalizedSearch = typeof search === "string" ? search.trim() : "";
+  if (!normalizedSearch) {
+    return filter;
+  }
+
+  filter.$or = [
+    { title: { $regex: normalizedSearch, $options: "i" } },
+    { location: { $regex: normalizedSearch, $options: "i" } },
+    { country: { $regex: normalizedSearch, $options: "i" } },
+    { description: { $regex: normalizedSearch, $options: "i" } },
+  ];
+
+  return filter;
+};
+
+module.exports.buildListingFilter = buildListingFilter;
+
 module.exports.index = async (req, res) => {
-  const { type } = req.query;
-  const filter = type && type !== "all" ? { type } : {};
+  const { type, search } = req.query;
+  const filter = buildListingFilter({ type, search });
   const allListings = await Listing.find(filter);
   res.render("listings/index.ejs", {
     allListings,
     listingTypes,
     currentType: type || "all",
+    searchTerm: typeof search === "string" ? search : "",
   });
 };
 
@@ -59,12 +86,21 @@ module.exports.showListing = async (req, res) => {
 };
 
 module.exports.createListing = async (req, res, next) => {
-  let response = await geocodingClient
-    .forwardGeocode({
-      query: req.body.listing.location,
-      limit: 1,
-    })
-    .send();
+  let geometry = {
+    type: "Point",
+    coordinates: [0, 0],
+  };
+
+  if (geocodingClient && req.body.listing.location) {
+    let response = await geocodingClient
+      .forwardGeocode({
+        query: req.body.listing.location,
+        limit: 1,
+      })
+      .send();
+
+    geometry = response.body.features[0]?.geometry || geometry;
+  }
 
   let url = req.file.path;
   let filename = req.file.filename;
@@ -72,7 +108,7 @@ module.exports.createListing = async (req, res, next) => {
   newListing.owner = req.user._id;
   newListing.image = { url, filename };
 
-  newListing.geometry = response.body.features[0].geometry;
+  newListing.geometry = geometry;
 
   let savedListing = await newListing.save();
   console.log(savedListing);

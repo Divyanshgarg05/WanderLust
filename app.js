@@ -25,10 +25,11 @@ const userRouter = require("./routes/user.js");
 
 const dbUrl = process.env.ATLASDB_URL;
 
-
 // Agar env var set hi nahi hai
 if (!dbUrl) {
-  console.error("❌ ERROR: ATLASDB_URL is not defined. Check your environment variables.");
+  console.error(
+    "❌ ERROR: ATLASDB_URL is not defined. Check your environment variables.",
+  );
   process.exit(1);
 }
 
@@ -96,11 +97,11 @@ app.use((req, res, next) => {
 
   // 🔑 yahan change: hamesha defined rahega
   res.locals.currUser = req.user || null;
+  res.locals.searchTerm = req.query.search || "";
+  res.locals.currentType = req.query.type || "all";
 
   next();
 });
-
-
 
 app.use("/listings", listingsRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
